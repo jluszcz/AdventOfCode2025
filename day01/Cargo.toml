@@ -1,0 +1,9 @@
+[package]
+name = "day01"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.*"
+aoc_util = { git = "https://github.com/jluszcz/AdventOfCode-rs" }
+log = "*"
