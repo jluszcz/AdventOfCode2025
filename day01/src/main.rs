@@ -37,6 +37,27 @@ impl Debug for Rotation {
     }
 }
 
+struct Rotations(Vec<Rotation>);
+
+impl TryFrom<Vec<String>> for Rotations {
+    type Error = anyhow::Error;
+
+    fn try_from(value: Vec<String>) -> Result<Self, Self::Error> {
+        let count = value.len();
+
+        let rotations = value
+            .into_iter()
+            .filter_map(|l| Rotation::from_str(l.as_str()).ok())
+            .collect::<Vec<Rotation>>();
+
+        if rotations.len() == count {
+            Ok(Self(rotations))
+        } else {
+            Err(anyhow::anyhow!("Incorrect number of rotations"))
+        }
+    }
+}
+
 #[derive(Debug)]
 struct Dial(usize);
 
@@ -47,7 +68,7 @@ impl Dial {
         Self(50)
     }
 
-    fn rotate(self, rotation: Rotation) -> Self {
+    fn rotate(self, rotation: Rotation) -> (usize, Self) {
         trace!("Rotating {self:?} {rotation:?}");
 
         let magnitude = rotation.value % Self::SIZE;
@@ -60,32 +81,35 @@ impl Dial {
         let dial = Self(value);
 
         debug!("Rotated to {dial:?}");
-        dial
+        (if dial.0 == 0 { 1 } else { 0 }, dial)
     }
 }
 
-fn password(input: Vec<String>) -> usize {
-    let rotations = input
-        .into_iter()
-        .filter_map(|l| Rotation::from_str(l.as_str()).ok())
-        .collect::<Vec<Rotation>>();
+#[derive(Debug)]
+#[allow(dead_code)]
+struct Password(usize);
 
-    let mut password = 0;
+impl TryFrom<Vec<String>> for Password {
+    type Error = anyhow::Error;
 
-    let mut dial = Dial::new();
-    for rotation in rotations {
-        dial = dial.rotate(rotation);
-        if dial.0 == 0 {
-            password += 1;
+    fn try_from(value: Vec<String>) -> Result<Self, Self::Error> {
+        let mut password = 0;
+
+        let mut dial = Dial::new();
+        for rotation in Rotations::try_from(value)?.0 {
+            let pw;
+            (pw, dial) = dial.rotate(rotation);
+
+            password += pw;
         }
-    }
 
-    password
+        Ok(Self(password))
+    }
 }
 
 fn main() -> Result<()> {
-    let password = password(aoc_util::init()?);
-    println!("{password}");
+    let password = Password::try_from(aoc_util::input()?)?;
+    println!("{password:?}");
 
     Ok(())
 }
@@ -95,20 +119,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_rotation_parsing() -> Result<()> {
-        let rotation_l38 = "L38".parse::<Rotation>()?;
-        assert!(matches!(rotation_l38.direction, Direction::L));
-        assert_eq!(rotation_l38.value, 38);
-
-        let rotation_r14 = "R14".parse::<Rotation>()?;
-        assert!(matches!(rotation_r14.direction, Direction::R));
-        assert_eq!(rotation_r14.value, 14);
-
-        Ok(())
-    }
-
-    #[test]
-    fn part_1_example_rotations() -> Result<()> {
+    fn example_rotations() -> Result<()> {
         let input = aoc_util::init_test()?;
         let rotations = input
             .into_iter()
@@ -123,8 +134,7 @@ mod tests {
         let expected = vec![82, 52, 0, 95, 55, 0, 99, 0, 14, 32];
 
         for (expected, rotation) in expected.into_iter().zip(rotations.into_iter()) {
-            dial = dial.rotate(rotation);
-            println!("{dial:?}");
+            (_, dial) = dial.rotate(rotation);
             assert_eq!(expected, dial.0);
         }
 
@@ -132,8 +142,8 @@ mod tests {
     }
 
     #[test]
-    fn part_1_example() -> Result<()> {
-        assert_eq!(3, password(aoc_util::init_test()?));
+    fn example() -> Result<()> {
+        assert_eq!(3, Password::try_from(aoc_util::test_input()?)?.0);
 
         Ok(())
     }
