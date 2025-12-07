@@ -108,7 +108,7 @@ impl TryFrom<Vec<String>> for Password {
 }
 
 fn main() -> Result<()> {
-    let password = Password::try_from(aoc_util::input()?)?;
+    let password = Password::try_from(aoc_util::init()?)?;
     println!("{password:?}");
 
     Ok(())
@@ -143,7 +143,7 @@ mod tests {
 
     #[test]
     fn example() -> Result<()> {
-        assert_eq!(3, Password::try_from(aoc_util::test_input()?)?.0);
+        assert_eq!(3, Password::try_from(aoc_util::init_test()?)?.0);
 
         Ok(())
     }
