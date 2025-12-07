@@ -1,5 +1,6 @@
 use anyhow::Result;
 use log::{debug, trace};
+use std::collections::HashSet;
 use std::fmt::Debug;
 
 #[derive(Debug)]
@@ -43,14 +44,34 @@ impl Grid {
         adj_count < 4
     }
 
-    fn accessible_roll_count(&self) -> usize {
+    fn remove_accessible_rolls(&mut self) -> usize {
         let mut count = 0;
+
+        let mut to_remove = HashSet::new();
 
         for x in 0..self.0.len() {
             for y in 0..self.0[x].len() {
                 if self.is_roll_accessible(x, y) {
+                    to_remove.insert((x, y));
                     count += 1;
                 }
+            }
+        }
+
+        to_remove.iter().for_each(|&(x, y)| self.0[y][x] = false);
+
+        count
+    }
+
+    fn accessible_roll_count(&mut self) -> usize {
+        let mut count = 0;
+
+        loop {
+            let accessible_rolls = self.remove_accessible_rolls();
+            count += accessible_rolls;
+
+            if accessible_rolls == 0 {
+                break;
             }
         }
 
@@ -59,7 +80,7 @@ impl Grid {
 }
 
 fn main() -> Result<()> {
-    let grid = Grid::try_from(aoc_util::init()?)?;
+    let mut grid = Grid::try_from(aoc_util::init()?)?;
 
     let accessible_roll_count = grid.accessible_roll_count();
     println!("{accessible_roll_count}");
@@ -73,9 +94,9 @@ mod tests {
 
     #[test]
     fn example() -> Result<()> {
-        let grid = Grid::try_from(aoc_util::init_test()?)?;
+        let mut grid = Grid::try_from(aoc_util::init_test()?)?;
 
-        assert_eq!(13, grid.accessible_roll_count());
+        assert_eq!(43, grid.accessible_roll_count());
 
         Ok(())
     }
