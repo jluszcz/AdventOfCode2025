@@ -61,16 +61,18 @@ impl Manifolds {
         for i in 0..len {
             match self.manifolds[index][i] {
                 Manifold::Splitter => {
-                    if i > 0 {
-                        self.manifolds[index][i - 1] = Manifold::Beam;
-                    }
+                    if index > 0 && matches!(self.manifolds[index - 1][i], Manifold::Beam) {
+                        if i > 0 {
+                            self.manifolds[index][i - 1] = Manifold::Beam;
+                        }
 
-                    if i + 1 < len {
-                        self.manifolds[index][i + 1] = Manifold::Beam;
-                    }
+                        if i + 1 < len {
+                            self.manifolds[index][i + 1] = Manifold::Beam;
+                        }
 
-                    trace!("Splitting at {i}, {index}");
-                    self.splits += 1;
+                        trace!("Splitting at {i}, {index}");
+                        self.splits += 1;
+                    }
                 }
                 Manifold::Empty => {
                     if index > 0
@@ -138,7 +140,6 @@ mod tests {
     use super::*;
 
     #[test]
-    #[ignore]
     fn example() -> Result<()> {
         let manifolds = Manifolds::try_from(aoc_util::init_test()?)?;
 
