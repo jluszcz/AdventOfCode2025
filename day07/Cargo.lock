@@ -70,7 +70,7 @@ checksum = "a23eb6b1614318a8071c9b2521f36b424b2c83db5eb3a0fead4a6c0809af6e61"
 [[package]]
 name = "aoc_util"
 version = "0.1.0"
-source = "git+https://github.com/jluszcz/AdventOfCode-rs#1194056002a7b38635705e629d09090de27b50b6"
+source = "git+https://github.com/jluszcz/AdventOfCode-rs#3225f733bf3fb2681b172847bc08f228a387830c"
 dependencies = [
  "anyhow",
  "clap",
@@ -113,60 +113,6 @@ checksum = "b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75"
 
 [[package]]
 name = "day01"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "aoc_util",
- "log",
-]
-
-[[package]]
-name = "day02"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "aoc_util",
- "log",
-]
-
-[[package]]
-name = "day03"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "aoc_util",
- "log",
-]
-
-[[package]]
-name = "day04"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "aoc_util",
- "log",
-]
-
-[[package]]
-name = "day05"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "aoc_util",
- "log",
-]
-
-[[package]]
-name = "day06"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "aoc_util",
- "log",
-]
-
-[[package]]
-name = "day07"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -229,9 +175,9 @@ dependencies = [
 
 [[package]]
 name = "log"
-version = "0.4.29"
+version = "0.4.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
+checksum = "34080505efa8e45a4b816c349525ebe327ceaa8559756f0356cba97ef3bf7432"
 
 [[package]]
 name = "memchr"
