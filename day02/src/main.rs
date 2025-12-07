@@ -1,9 +1,16 @@
 use anyhow::{bail, Result};
+use log::debug;
 use std::fmt::Debug;
 use std::str::FromStr;
 
 #[derive(Debug)]
 struct Ranges(Vec<Range>);
+
+impl Ranges {
+    fn invalid_id_sum(&self) -> usize {
+        self.0.iter().flat_map(Range::invalid_ids).sum()
+    }
+}
 
 impl TryFrom<Vec<String>> for Ranges {
     type Error = anyhow::Error;
@@ -40,34 +47,39 @@ impl Range {
         let mut invalid_ids = Vec::new();
 
         for i in self.0..=self.1 {
-            // Count digits
-            let num_digits = if i == 0 {
-                1
-            } else {
-                (i as f64).log10().floor() as usize + 1
-            };
+            if Self::is_invalid_id(i) {
+                invalid_ids.push(i);
+            }
+        }
 
-            // Check if even number of digits
-            if num_digits % 2 == 0 {
-                // Calculate the divisor to split the number in half
-                let divisor = 10_usize.pow((num_digits / 2) as u32);
+        debug!("{:?}", invalid_ids);
+        invalid_ids
+    }
 
-                let first_half = i / divisor;
-                let second_half = i % divisor;
+    fn is_invalid_id(id: usize) -> bool {
+        let s = id.to_string();
+        let len = s.len();
 
-                if first_half == second_half {
-                    invalid_ids.push(i);
+        // Try all possible pattern lengths from 1 to len/2
+        for pattern_len in 1..=len / 2 {
+            if len.is_multiple_of(pattern_len) {
+                let pattern = &s[0..pattern_len];
+                let repeats = len / pattern_len;
+
+                // Pattern must repeat at least twice
+                if repeats >= 2 && pattern.repeat(repeats) == s {
+                    return true;
                 }
             }
         }
 
-        invalid_ids
+        false
     }
 }
 
 fn main() -> Result<()> {
     let ranges = Ranges::try_from(aoc_util::init()?)?;
-    let sum = ranges.0.iter().flat_map(Range::invalid_ids).sum::<usize>();
+    let sum = ranges.invalid_id_sum();
 
     println!("{sum}");
 
@@ -79,13 +91,25 @@ mod tests {
     use super::*;
 
     #[test]
+    fn is_invalid() -> Result<()> {
+        assert!(Range::is_invalid_id(12341234));
+        assert!(Range::is_invalid_id(123123123));
+        assert!(Range::is_invalid_id(1212121212));
+        assert!(Range::is_invalid_id(1111111));
+
+        Ok(())
+    }
+
+    #[test]
     fn example() -> Result<()> {
-        let expected = vec![2, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0];
+        let expected = vec![2, 2, 2, 1, 1, 0, 1, 1, 1, 1, 1];
         let ranges = Ranges::try_from(aoc_util::init_test()?)?;
 
-        for (expected, range) in expected.into_iter().zip(ranges.0) {
+        for (expected, range) in expected.into_iter().zip(&ranges.0) {
             assert_eq!(expected, range.invalid_ids().len());
         }
+
+        assert_eq!(4174379265, ranges.invalid_id_sum());
 
         Ok(())
     }
