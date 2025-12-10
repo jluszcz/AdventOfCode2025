@@ -1,5 +1,6 @@
 use anyhow::Result;
-use aoc_util::grid::{Grid, Point};
+use aoc_util::grid::Grid;
+use aoc_util::math::two_dimensional::Point;
 use log::{debug, trace};
 use std::fmt::Debug;
 

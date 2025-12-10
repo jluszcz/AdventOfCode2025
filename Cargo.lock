@@ -70,7 +70,7 @@ checksum = "a23eb6b1614318a8071c9b2521f36b424b2c83db5eb3a0fead4a6c0809af6e61"
 [[package]]
 name = "aoc_util"
 version = "0.1.0"
-source = "git+https://github.com/jluszcz/AdventOfCode-rs#7d535a52926ffa897560b3eed0f4a2aa70b7f947"
+source = "git+https://github.com/jluszcz/AdventOfCode-rs#768c6346bcb222164889f3fff8f72af88d80419d"
 dependencies = [
  "anyhow",
  "clap",

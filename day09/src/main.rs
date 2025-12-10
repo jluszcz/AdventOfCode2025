@@ -1,5 +1,5 @@
 use anyhow::Result;
-use aoc_util::grid::Point;
+use aoc_util::math::two_dimensional::Point;
 
 #[derive(Debug, Clone)]
 struct Floor(Vec<Point>);
